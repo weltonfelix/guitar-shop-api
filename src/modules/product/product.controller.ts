@@ -7,8 +7,10 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 
+import { AuthGuard } from '../auth/auth.guard';
 import { ProductService } from './product.service';
 
 import { CreateProductDTO } from './dto/create-product.dto';
@@ -18,6 +20,7 @@ import { UpdateProductDTO } from './dto/update-product.dto';
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+  @UseGuards(AuthGuard)
   @Post()
   async create(@Body() data: CreateProductDTO) {
     return await this.productService.create(data);
@@ -39,6 +42,7 @@ export class ProductController {
     }
   }
 
+  @UseGuards(AuthGuard)
   @Put(':id')
   async update(@Param('id') id: string, @Body() data: UpdateProductDTO) {
     try {
@@ -50,6 +54,7 @@ export class ProductController {
     }
   }
 
+  @UseGuards(AuthGuard)
   @Delete(':id')
   async remove(@Param('id') id: string) {
     try {

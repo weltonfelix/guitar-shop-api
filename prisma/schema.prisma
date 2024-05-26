@@ -17,23 +17,14 @@ model Product {
 }
 
 model Order {
-  id           String             @id @default(uuid())
-  status       String
-  total        Float
-  name         String
-  cpf          String
-  email        String
-  phone        String
-  address      String
-  number       String?
-  complement   String?
-  zipCode      String
-  neighborhood String
-  city         String
-  state        String
-  products     ProductsOnOrders[]
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
+  id        String             @id @default(uuid())
+  status    String
+  total     Float
+  user      User               @relation(fields: [userId], references: [id])
+  products  ProductsOnOrders[]
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  userId    String
 }
 
 model ProductsOnOrders {
@@ -44,4 +35,21 @@ model ProductsOnOrders {
   orderId   String
   product   Product @relation(fields: [productId], references: [id])
   order     Order   @relation(fields: [orderId], references: [id])
+}
+
+model User {
+  id           String  @id @default(uuid())
+  email        String  @unique
+  passwordHash String
+  name         String
+  cpf          String  @unique
+  phone        String
+  address      String
+  number       String?
+  complement   String?
+  zipCode      String
+  neighborhood String
+  city         String
+  state        String
+  Order        Order[]
 }

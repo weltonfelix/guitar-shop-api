@@ -8,7 +8,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 export class OrderService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createOrderDto: CreateOrderDto) {
+  async create(userId: string, createOrderDto: CreateOrderDto) {
     let total = 0;
     const productsOnOrder = [];
     for (const product of createOrderDto.products) {
@@ -28,9 +28,9 @@ export class OrderService {
       });
     }
 
-    await this.prisma.order.create({
+    return await this.prisma.order.create({
       data: {
-        ...createOrderDto,
+        userId,
         products: {
           createMany: { data: productsOnOrder },
         },

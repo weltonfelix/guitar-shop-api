@@ -3,27 +3,37 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   HttpException,
+  UseGuards,
+  Req,
+  InternalServerErrorException,
+  BadRequestException,
 } from '@nestjs/common';
 
+import { AuthGuard, AuthRequest } from '../auth/auth.guard';
 import { OrderService } from './order.service';
 
 import { CreateOrderDto } from './dto/create-order.dto';
-
+@UseGuards(AuthGuard)
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Post()
-  async create(@Body() createOrderDto: CreateOrderDto) {
+  async create(
+    @Body() createOrderDto: CreateOrderDto,
+    @Req() request: AuthRequest,
+  ) {
     try {
-      return await this.orderService.create(createOrderDto);
+      return await this.orderService.create(request.user.sub, createOrderDto);
     } catch (error) {
+      console.log(error)
       if (error.message === 'Product not found') {
-        throw new HttpException('Product not found', 404);
+        throw new BadRequestException('Product not found');
+      } else {
+        throw new InternalServerErrorException();
       }
     }
   }
