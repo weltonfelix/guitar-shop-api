@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 import { PrismaService } from 'src/database/prisma.service';
@@ -10,7 +10,7 @@ export class UsersService {
 
   async create(data: CreateUserDto) {
     if (data.password !== data.passwordConfirmation) {
-      throw new Error('Password confirmation does not match');
+      throw new BadRequestException('Password confirmation does not match');
     }
 
     const passwordHash = await bcrypt.hash(data.password, 10);
