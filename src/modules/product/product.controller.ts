@@ -11,14 +11,15 @@ import {
 
 import { ProductService } from './product.service';
 
-import { ProductDTO } from './product.dto';
+import { CreateProductDTO } from './dto/create-product.dto';
+import { UpdateProductDTO } from './dto/update-product.dto';
 
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Post()
-  async create(@Body() data: ProductDTO) {
+  async create(@Body() data: CreateProductDTO) {
     return await this.productService.create(data);
   }
 
@@ -39,7 +40,7 @@ export class ProductController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() data: Partial<ProductDTO>) {
+  async update(@Param('id') id: string, @Body() data: UpdateProductDTO) {
     try {
       return await this.productService.update(Number(id), data);
     } catch (error) {
