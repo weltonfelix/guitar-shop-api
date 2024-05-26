@@ -28,6 +28,7 @@ import { ProductService } from './product.service';
 
 import { CreateProductDTO, CreateProductResponseDTO } from './dto/create-product.dto';
 import { UpdateProductDTO } from './dto/update-product.dto';
+import { SearchProductsDTO } from './dto/search-products';
 
 @ApiTags('Product')
 @Controller('product')
@@ -68,6 +69,22 @@ export class ProductController {
   @Get()
   async findAll() {
     return await this.productService.findAll();
+  }
+
+  @ApiOperation({
+    summary: 'Search all products by name',
+  })
+  @ApiOkResponse({
+    schema: {
+      type: 'array',
+      items: {
+        $ref: getSchemaPath(CreateProductResponseDTO),
+      },
+    }
+  })
+  @Get('search')
+  async search(@Body() data: SearchProductsDTO) {
+    return await this.productService.searchByName(data.query);
   }
 
   @ApiOperation({
