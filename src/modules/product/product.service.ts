@@ -28,7 +28,7 @@ export class ProductService {
     return product;
   }
 
-  async update(id: number, data: ProductDTO) {
+  async update(id: number, data: Partial<ProductDTO>) {
     const productExists = await this.prisma.product.findUnique({
       where: { id },
     });

@@ -39,7 +39,7 @@ export class ProductController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() data: ProductDTO) {
+  async update(@Param('id') id: string, @Body() data: Partial<ProductDTO>) {
     try {
       return await this.productService.update(Number(id), data);
     } catch (error) {
