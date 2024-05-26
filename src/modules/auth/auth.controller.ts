@@ -16,7 +16,10 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-import { CreateUserDto } from '../users/dto/create-user.dto';
+import {
+  CreateUserDto,
+  CreateUserResponseDto,
+} from '../users/dto/create-user.dto';
 import { UsersService } from '../users/users.service';
 
 import { AuthService } from './auth.service';
@@ -33,9 +36,13 @@ export class AuthController {
   @ApiOperation({
     summary: 'Creates a new user',
   })
+  @ApiExtraModels(CreateUserResponseDto)
   @ApiResponse({
     status: 201,
     description: 'User created',
+    schema: {
+      $ref: '#/components/schemas/CreateUserResponseDto',
+    },
   })
   @ApiResponse({
     status: 400,

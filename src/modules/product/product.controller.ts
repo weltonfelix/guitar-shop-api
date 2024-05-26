@@ -26,7 +26,10 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { ProductService } from './product.service';
 
-import { CreateProductDTO, CreateProductResponseDTO } from './dto/create-product.dto';
+import {
+  CreateProductDTO,
+  CreateProductResponseDTO,
+} from './dto/create-product.dto';
 import { UpdateProductDTO } from './dto/update-product.dto';
 import { SearchProductsDTO } from './dto/search-products';
 
@@ -64,7 +67,7 @@ export class ProductController {
       items: {
         $ref: getSchemaPath(CreateProductResponseDTO),
       },
-    }
+    },
   })
   @Get()
   async findAll() {
@@ -80,7 +83,7 @@ export class ProductController {
       items: {
         $ref: getSchemaPath(CreateProductResponseDTO),
       },
-    }
+    },
   })
   @Get('search')
   async search(@Body() data: SearchProductsDTO) {
@@ -120,13 +123,7 @@ export class ProductController {
   @UseGuards(AuthGuard, RolesGuard)
   @Put(':id')
   async update(@Param('id') id: string, @Body() data: UpdateProductDTO) {
-    try {
-      return await this.productService.update(Number(id), data);
-    } catch (error) {
-      if (error.message === 'Product not found') {
-        throw new HttpException('Product not found', 404);
-      }
-    }
+    return await this.productService.update(+id, data);
   }
 
   @ApiBearerAuth()
@@ -141,12 +138,6 @@ export class ProductController {
   @UseGuards(AuthGuard, RolesGuard)
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    try {
-      return await this.productService.remove(Number(id));
-    } catch (error) {
-      if (error.message === 'Product not found') {
-        throw new HttpException('Product not found', 404);
-      }
-    }
+    return await this.productService.remove(+id);
   }
 }
