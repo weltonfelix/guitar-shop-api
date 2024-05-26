@@ -39,6 +39,7 @@ model ProductsOnOrders {
 
 model User {
   id           String  @id @default(uuid())
+  isAdmin      Boolean @default(false)
   email        String  @unique
   passwordHash String
   name         String

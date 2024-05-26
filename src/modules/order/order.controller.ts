@@ -12,7 +12,9 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 
-import { AuthGuard, AuthRequest } from '../auth/auth.guard';
+import { Roles } from '../auth/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { AuthGuard, AuthRequest } from '../auth/guards/auth.guard';
 import { OrderService } from './order.service';
 
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -26,42 +28,28 @@ export class OrderController {
     @Body() createOrderDto: CreateOrderDto,
     @Req() request: AuthRequest,
   ) {
-    try {
-      return await this.orderService.create(request.user.sub, createOrderDto);
-    } catch (error) {
-      console.log(error)
-      if (error.message === 'Product not found') {
-        throw new BadRequestException('Product not found');
-      } else {
-        throw new InternalServerErrorException();
-      }
-    }
+    return await this.orderService.create(request.user.sub, createOrderDto);
   }
 
-  @Get()
+  @Roles(['ADMIN'])
+  @UseGuards(RolesGuard)
+  @Get('all')
   async findAll() {
     return await this.orderService.findAll();
   }
 
+  @Get()
+  async findAllByUser(@Req() request: AuthRequest) {
+    return await this.orderService.findAllByUser(request.user.sub);
+  }
+
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    try {
-      return await this.orderService.findOne(id);
-    } catch (error) {
-      if (error.message === 'Order not found') {
-        throw new HttpException('Order not found', 404);
-      }
-    }
+  async findOne(@Param('id') id: string, @Req() request: AuthRequest) {
+    return await this.orderService.findOne(id, request.user);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-    try {
-      return await this.orderService.remove(id);
-    } catch (error) {
-      if (error.message === 'Order not found') {
-        throw new HttpException('Order not found', 404);
-      }
-    }
+  async remove(@Param('id') id: string, @Req() request: AuthRequest) {
+    return await this.orderService.remove(id, request.user);
   }
 }

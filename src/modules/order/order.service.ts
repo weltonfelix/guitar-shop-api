@@ -1,8 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from 'src/database/prisma.service';
 
 import { CreateOrderDto } from './dto/create-order.dto';
+
+interface RequestUser {
+  sub: string;
+  roles: string[];
+}
 
 @Injectable()
 export class OrderService {
@@ -17,7 +22,7 @@ export class OrderService {
       });
 
       if (!productExists) {
-        throw new Error('Product not found');
+        throw new NotFoundException('Product not found');
       }
 
       total += productExists.price * product.quantity;
@@ -44,7 +49,15 @@ export class OrderService {
     return this.prisma.order.findMany();
   }
 
-  async findOne(id: string) {
+  async findAllByUser(userId: string) {
+    return this.prisma.order.findMany({
+      where: {
+        userId,
+      },
+    });
+  }
+
+  async findOne(id: string, user: RequestUser) {
     const orderExists = await this.prisma.order.findUnique({
       where: { id },
       include: {
@@ -54,18 +67,24 @@ export class OrderService {
       },
     });
 
-    if (!orderExists) {
-      throw new Error('Order not found');
+    const isUserAllowed =
+      user.roles.includes('ADMIN') || orderExists?.userId === user.sub;
+
+    if (!orderExists || !isUserAllowed) {
+      throw new NotFoundException();
     }
 
     return orderExists;
   }
 
-  async remove(id: string) {
+  async remove(id: string, user: RequestUser) {
     const orderExists = await this.prisma.order.findUnique({ where: { id } });
 
-    if (!orderExists) {
-      throw new Error('Order not found');
+    const isUserAllowed =
+      user.roles.includes('ADMIN') || orderExists?.userId === user.sub;
+
+    if (!orderExists || !isUserAllowed) {
+      throw new NotFoundException();
     }
 
     await this.prisma.order.update({
